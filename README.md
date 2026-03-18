@@ -1,6 +1,8 @@
 🚀 API Pwn Lab
 A hands-on API security training platform for bug bounty hunters, pentesters, and developers.  Practice real-world API vulnerabilities in a safe, local environment.
 
+![APIPwnLab Logo](public/apipwnlab_logo1.png)
+
 ---
 
 ## 🧠 What You’ll Learn
