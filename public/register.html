@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Register</title>
+
+        <style>
+
+            body{
+                font-family:'Segoe UI';
+                background:#1f1f2e;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                height:100vh;
+                color:#eee;
+            }
+
+            .container{
+                background:#2b2b3a;
+                padding:40px;
+                border-radius:10px;
+                width:350px;
+                text-align:center;
+            }
+
+            input{
+                width:100%;
+                padding:12px;
+                margin-bottom:15px;
+                border:none;
+                border-radius:8px;
+                background:#1f1f2e;
+                color:#eee;
+            }
+
+            button{
+                width:100%;
+                padding:12px;
+                background:#00d1b2;
+                border:none;
+                border-radius:8px;
+                font-weight:bold;
+                cursor:pointer;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container">
+
+            <h2>Create Account</h2>
+
+            <input id="name" placeholder="Name">
+            <input id="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+
+            <button onclick="register()">Register</button>
+
+        </div>
+
+        <script>
+
+            async function register(){
+
+                const name=document.getElementById("name").value
+                const email=document.getElementById("email").value
+                const password=document.getElementById("password").value
+
+                await fetch("/register",{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({name,email,password})
+                });
+
+                alert("Registration successful")
+
+                window.location="login.html"
+
+            }
+
+        </script>
+
+    </body>
+</html>

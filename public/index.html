@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to APIPwnLab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <img src="apipwnlab_logo1.png" alt="APIPwnLab Logo" class="logo" />
+    <h1>Welcome to <span class="highlight">APIPwnLab</span>!</h1>
+    <p class="subtitle">Learn API & Auth vulnerabilities using <strong>curl</strong>, <strong>Postman</strong>, or <strong>Burp Suite</strong>.</p>
+    
+    <div class="instructions">
+      <h2>How to Start</h2>
+      <ol>
+        <li>Check available labs: <code>GET /labs.html</code></li>
+        <li>Read the lab goal: <code>Challenge: Decipher this!</code></li>
+        <li>Hints if stucked?: <code>Solve #2 to unlock the hint.</code></li>
+        <li>Check progress: <code>GET /labs/progress/:your_user_id</code></li>
+        <li>Reset lab: <code>PATCH /labs/reset</code></li>
+      </ol>
+    </div>
+
+    <a href="/labs.html"><button class="start-btn">Start Labs</button></a>
+
+    <footer>
+      <p>Made with ❤️ by <strong>John Ebinyi Odey (Redhound | Hotwrist)</strong></p>
+      <p>Use responsibly. For learning & testing only.</p>
+    </footer>
+  </div>
+</body>
+</html>

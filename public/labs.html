@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>APIPwnLab Labs</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1f1f2e;
+      color: #eee;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00d1b2;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    #search-container {
+      max-width: 400px;
+      margin: 0 auto 40px auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    #search {
+      width: 100%;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    #labs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .lab-card {
+      background-color: #2b2b3a;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      border-left: 5px solid #00d1b2;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .lab-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #00d1b2;
+    }
+
+    p {
+      color: #ccc;
+      line-height: 1.5;
+      margin: 5px 0;
+    }
+
+    .endpoint {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 10px;
+      background-color: #ff6b6b;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .difficulty {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .difficulty.easy { background-color: #28a745; }
+    .difficulty.medium { background-color: #ffc107; color: #111; }
+    .difficulty.hard { background-color: #dc3545; }
+
+    /*.tasks {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #33334d;
+      border-radius: 8px;
+      display: none;
+      color: #ddd;
+    }*/
+
+    .tasks{
+      display:none;
+      margin-top:15px;
+    }
+
+  .task{
+      background:#33334d;
+      padding:10px;
+      margin-top:8px;
+      border-radius:6px;
+      cursor:pointer;
+  }
+
+  .hint{
+      display:none;
+      margin-top:5px;
+      font-size:0.9rem;
+      color:#bbb;
+  }
+
+    .points {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #00d1b2;
+    }
+
+    .progress-bar {
+      width: 100%;
+      background-color: #44445a;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 10px;
+      margin-top: 5px;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: #00d1b2;
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 15px 0 0 0;
+    }
+
+    #no-results {
+      text-align: center;
+      color: #ff6b6b;
+      margin-top: 20px;
+      font-size: 1.1rem;
+    }
+
+    .navbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:15px 30px;
+      background:#2b2b3a;
+      margin-bottom:30px;
+      border-radius:10px;
+    }
+
+   .nav-links a{
+      color:#eee;
+      margin-left:20px;
+      text-decoration:none;
+      font-weight:500;
+   }
+
+   .nav-links a:hover{
+      color:#00d1b2;
+   }
+
+   .celebration-popup{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e1e1e;
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      z-index: 9999;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+      <div class="logo">APIPwnLab</div>
+
+      <div class="nav-links">
+      <a href="labs.html">Labs</a>
+      <!--<a href="scoreboard.html">Scoreboard</a>-->
+      <a href="#" onclick="logout()">Logout</a>
+      </div>
+  </nav>
+
+  <h1>APIPwnLab Labs</h1>
+
+  <div id="search-container">
+    <input type="text" id="search" placeholder="Search labs by name or description...">
+  </div>
+
+  <div id="labs"></div>
+  <div id="no-results" style="display:none;">No labs found 😕</div>
+
+  <script>
+    let allLabs = [];
+
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!token) {
+      window.location = "/login.html";
+    }
+
+    function getStoredSolvedTasks(){
+      return JSON.parse(localStorage.getItem("solvedTasks")) || [];
+    }
+
+    function saveSolvedTasks(tasks){
+      localStorage.setItem("solvedTasks", JSON.stringify(tasks));
+    }
+
+    async function loadLabs() {
+      const labsRes = await fetch("/labs");
+      const labs = await labsRes.json();
+
+      const progressRes = await fetch(`/labs/progress/${userId}`, {
+          headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const progress = await progressRes.json();
+
+      // For celebration pop-ups-----------------------------------------
+      const previousSolved = getStoredSolvedTasks();
+
+      let currentSolved = [];
+
+      progress.forEach(p => {
+        currentSolved.push(...p.solvedTasks);
+      });
+
+      const newSolved = currentSolved.filter(t => !previousSolved.includes(t));
+
+      saveSolvedTasks(currentSolved);
+
+      if(newSolved.length > 0){
+        showCelebration(newSolved);
+      }
+      //-----------------------------------------------------------------
+
+      allLabs = labs.map(lab => {
+
+        const userLab = progress.find(p => p.labId === lab.id);
+
+        let solvedTasks = userLab ? userLab.solvedTasks.length : 0;
+        let totalTasks = lab.tasks.length;
+
+        let percent = Math.floor((solvedTasks / totalTasks) * 100);
+        let points = userLab ? userLab.totalPoints : 0;
+
+        // Attach hints to each task
+        const tasksWithHints = lab.tasks.map(task => ({
+          ...task,
+          solved: userLab?.solvedTasks?.includes(task.name) || false
+        }));
+
+        return {
+          ...lab,
+          tasks: tasksWithHints,
+          difficulty: lab.difficulty || ["easy","medium","hard"][Math.floor(Math.random()*3)],
+          points: points,
+          progress: percent
+        };
+      });
+      displayLabs(allLabs);
+    }
+
+    loadLabs();
+
+    const searchInput = document.getElementById("search");
+
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase();
+
+      const filtered = allLabs.filter(lab =>
+        lab.name.toLowerCase().includes(query) ||
+        lab.description.toLowerCase().includes(query)
+      );
+      displayLabs(filtered);
+    });
+
+    function displayLabs(labs) {
+
+      const container = document.getElementById("labs");
+      const noResults = document.getElementById("no-results");
+
+      container.innerHTML = "";
+
+      if (labs.length === 0) {
+        noResults.style.display = "block";
+        return;
+      } else {
+        noResults.style.display = "none";
+      }
+
+      labs.forEach(lab => {
+
+      const div = document.createElement("div");
+      div.classList.add("lab-card");
+
+      // Hide tasks initially
+      div.innerHTML = `
+        <h3>${lab.name}</h3>
+        <p>${lab.description}</p>
+        <span class="endpoint">${lab.endpoint}</span>
+        <span class="difficulty ${lab.difficulty}">${lab.difficulty.toUpperCase()}</span>
+
+        <div class="points">Points: ${lab.points}</div>
+
+        <div class="progress-bar">
+          <div class="progress" style="width:${lab.progress}%"></div>
+        </div>
+
+        <div class="tasks" style="display:none;">
+            ${lab.tasks.map(t => `
+              <div class="task">
+                <strong>${t.name}</strong> - ${t.solved ? "✅" : "❌"}
+                <div class="hint" style="display:none">Hint: ${t.hint || "No hint available"}</div>
+              </div>
+            `).join('')}
+        </div>
+      <hr>
+    `;
+        /*
+        // click to show/hide tasks
+        div.addEventListener("click", function(e) {
+        // prevent toggle when clicking a task or hint
+        if (e.target.closest(".task")) return;
+
+        const tasks = div.querySelector(".tasks");
+        tasks.style.display = tasks.style.display === "block" ? "none" : "block";
+      });
+
+      // add click for hints inside this card only
+      const taskElements = div.querySelectorAll(".task");
+      taskElements.forEach(task => {
+        task.addEventListener("click", function(e){
+          e.stopPropagation(); // stop the card toggle
+          const hint = task.querySelector(".hint");
+          hint.style.display = hint.style.display === "block" ? "none" : "block";
+        });
+      });*/
+      container.appendChild(div);
+      });
+    }
+
+    function logout() {
+      localStorage.removeItem("token")
+      localStorage.removeItem("userId")
+
+      window.location="login.html"
+    }
+
+    function showCelebration(tasks) {
+      const popup = document.createElement("div");
+      popup.className = "celebration-popup";
+      popup.innerHTML = `
+        <h2>🎉 HURRAY!</h2>
+        <p>You solved:</p>
+        <ul> ${tasks.map(t => `<li>${t}</li>`).join("")}</ul>`;
+
+      document.body.appendChild(popup);
+
+      setTimeout(()=>{ popup.remove(); },5000);
+      launchConfetti();
+    }
+
+    function launchConfetti(){
+      confetti({ particleCount: 200, spread: 120, origin: { y: 0.6 }});
+    }
+
+  </script>
+
+  <script src="confetti.js"></script>
+
+</body>
+</html>

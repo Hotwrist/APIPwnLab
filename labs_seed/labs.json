@@ -1,0 +1,25 @@
+[
+    {
+      "name": "IDOR",
+      "description": "Exploit insecure direct object references",
+      "endpoint": "/idor",
+      "difficulty": "easy",
+      "tasks": [
+        { "name": "Access another user record", "points": 10, "hint": "Some profile endpoints return data based on an id parameter. Try changing the id value."},
+        { "name": "Enumerate users profile", "points": 15, "hint": "Some endpoints return full users information without proper access control." },
+        { "name": "Modify another user profile", "points": 25, "hint": "If profile updates require an id, does the server verify that the id belongs to you?" }
+      ]
+    },
+    {
+      "name": "Mass Assignment",
+      "description": "Exploit unrestricted property assignment to escalate privileges",
+      "endpoint": "/mass-assignment",
+      "difficulty": "medium",
+      "tasks": [
+        { "name": "Modify your own role", "points": 10, "hint": "Sometimes APIs accept more fields than expected. What happens if you send additional properties in the request body?" },
+        { "name": "Become an admin", "points": 40, "hint": "Some APIs rely on special headers to unlock additional functionality. Inspect the request carefully and experiment with adding custom headers." },
+        { "name": "Modify protected account fields (Become Verified)", "points": 20, "hint": "If roles exist in the system, can you assign yourself a more privileged one?" },
+        { "name": "Modify protected account fields (Become Premium)", "points": 30, "hint": "If roles exist in the system, can you assign yourself a more priviledged one?" }
+      ]
+    }
+]

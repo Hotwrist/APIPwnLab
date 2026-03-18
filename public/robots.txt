@@ -1,0 +1,3 @@
+Disallow: /internal
+Disallow: /vouchers.html
+Disallow: /internal/vouchers/history

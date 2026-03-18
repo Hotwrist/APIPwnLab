@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Voucher History</title>
+    </head>
+
+    <body>
+
+        <h2>Past Premium Voucher Usage</h2>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Voucher Code</th>
+                    <th>Date Used</th>
+                </tr>
+            </thead>
+
+            <tbody id="voucherTable"></tbody>
+
+        </table>
+
+        <script>
+            async function loadVouchers(){
+
+            const res = await fetch("/internal/vouchers/history");
+
+            const data = await res.json();
+
+                const table = document.getElementById("voucherTable");
+
+                data.forEach(v => {
+
+                const row = `
+                    <tr>
+                        <td>${v.usedByUserId}</td>
+                        <td>${v.code}</td>
+                        <td>${new Date(v.usedAt).toLocaleDateString()}</td>
+                    </tr>
+                    `;
+
+                table.innerHTML += row;
+
+                });
+            }
+
+            loadVouchers();
+
+        </script>
+    </body>
+</html>
