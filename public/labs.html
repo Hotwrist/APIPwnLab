@@ -217,13 +217,30 @@
   <div id="no-results" style="display:none;">No labs found 😕</div>
 
   <script>
+    function isTokenExpired(token) {
+  	try {
+    		const payload = JSON.parse(atob(token.split('.')[1]));
+    		const currentTime = Math.floor(Date.now() / 1000);
+
+    		return payload.exp < currentTime;
+  	} catch (e) {
+    		return true; // treat invalid token as expired
+  	}
+    }
+    
     let allLabs = [];
 
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
-    if (!token) {
-      window.location = "/login.html";
+    if (!token || isTokenExpired(token)) {
+    	// Remove expired token/invalid data
+    	localStorage.removeItem("token");
+  	  localStorage.removeItem("userId");
+  	
+  	  alert("Session expired. Please login again.");
+  	
+     	window.location = "/login.html";
     }
 
     function getStoredSolvedTasks(){
